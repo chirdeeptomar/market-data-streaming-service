@@ -1,5 +1,10 @@
 pub mod proto {
+    use tonic::include_file_descriptor_set;
+
     tonic::include_proto!("market_data_service");
+
+    pub(crate) const FILE_DESCRIPTOR_SET: &[u8] =
+        include_file_descriptor_set!("service_descriptor");
 }
 use rand::Rng;
 use std::net::ToSocketAddrs;
@@ -62,7 +67,12 @@ impl proto::market_data_service_server::MarketDataService for MarketDataServer {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let server = MarketDataServer::default();
 
+    let service = tonic_reflection::server::Builder::configure()
+        .register_encoded_file_descriptor_set(proto::FILE_DESCRIPTOR_SET)
+        .build()?;
+
     Server::builder()
+        .add_service(service)
         .add_service(MarketDataServiceServer::new(server))
         .serve("[::1]:50051".to_socket_addrs().unwrap().next().unwrap())
         .await
