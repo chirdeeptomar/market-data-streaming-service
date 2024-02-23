@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package market_data_service;
+
+service MarketDataService {
+    rpc GetMarketData (MarketDataRequest) returns (MarketDataResponse) {}
+    rpc GetMarketDataStream (MarketDataRequest) returns (stream MarketDataPayload) {}
+}
+
+message MarketDataRequest {
+    string instrument = 1;
+    string date = 2;
+}
+
+message MarketDataResponse {
+    repeated MarketDataPayload response = 1;
+}
+
+message MarketDataPayload {
+    string instrument = 1;
+    double bid = 2;
+    double ask = 3;
+    optional double bid_size = 4;
+    optional double ask_size = 5;
+    optional double last_sale = 6;
+    optional double last_size	= 7;
+    optional double quote_time	= 8;
+    optional double trade_time	= 9;
+    optional string exchange	= 10;
+    optional double volume = 11;
+}
