@@ -1,14 +1,14 @@
-pub mod config;
+pub(crate) mod config;
 
-use rand::Rng;
 use std::time::Duration;
 use stream::{wrappers::ReceiverStream, StreamExt};
 use tokio::sync::mpsc;
 use tokio_stream::{self as stream};
 use tonic::{Request, Response, Status};
 
-use crate::proto::{
-    market_data_service_server, MarketDataPayload, MarketDataRequest, MarketDataResponse,
+use crate::{
+    proto::{market_data_service_server, MarketDataPayload, MarketDataRequest, MarketDataResponse},
+    utils::Factory,
 };
 
 #[derive(Debug, Default)]
@@ -20,27 +20,13 @@ impl market_data_service_server::MarketDataService for MarketDataServer {
         &self,
         request: Request<MarketDataRequest>,
     ) -> Result<Response<MarketDataResponse>, Status> {
-        let mut rng = rand::thread_rng();
-
         let input = request.get_ref();
         println!(
             "Non-Streaming Request: Fetching Market data for: {} ",
             input.instrument
         );
         let response = MarketDataResponse {
-            response: vec![MarketDataPayload {
-                instrument: input.instrument.to_string(),
-                bid: rng.gen(),
-                ask: rng.gen(),
-                bid_size: None,
-                ask_size: None,
-                last_sale: None,
-                last_size: None,
-                quote_time: None,
-                trade_time: None,
-                exchange: None,
-                volume: None,
-            }],
+            response: vec![MarketDataPayload::new(input)],
         };
         Result::Ok(Response::new(response))
     }
@@ -57,22 +43,9 @@ impl market_data_service_server::MarketDataService for MarketDataServer {
             "Streaming Request: Fetching Market data for: {} ",
             input.instrument
         );
-        let mut rng = rand::thread_rng();
 
         // creating infinite stream with requested message
-        let repeat = std::iter::repeat(MarketDataPayload {
-            instrument: input.instrument.to_string(),
-            bid: rng.gen(),
-            ask: rng.gen(),
-            bid_size: None,
-            ask_size: None,
-            last_sale: None,
-            last_size: None,
-            quote_time: None,
-            trade_time: None,
-            exchange: None,
-            volume: None,
-        });
+        let repeat = std::iter::repeat(MarketDataPayload::new(input));
 
         let mut stream = Box::pin(tokio_stream::iter(repeat).throttle(Duration::from_millis(200)));
 

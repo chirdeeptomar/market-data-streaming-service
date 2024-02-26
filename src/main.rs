@@ -1,5 +1,6 @@
 mod proto;
 mod server;
+mod utils;
 
 use proto::market_data_service_server::MarketDataServiceServer;
 use server::config::{get_scheme_grpc, get_server_host, get_server_port};
