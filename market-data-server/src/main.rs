@@ -22,10 +22,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(MarketDataServiceServer::new(server))
         .serve(address.to_socket_addrs().unwrap().next().unwrap());
 
-    println!("Server Listening on: {}://{}", get_scheme_grpc(), address);
+    log::info!("Server Listening on: {}://{}", get_scheme_grpc(), address);
 
     if let Err(e) = grpc_server.await {
-        eprintln!("server error: {}", e);
+        log::error!("server error: {}", e);
     }
 
     Ok(())

@@ -17,15 +17,24 @@ message MarketDataResponse {
 }
 
 message MarketDataPayload {
-    string instrument = 1;
-    double bid = 2;
-    double ask = 3;
-    optional double bid_size = 4;
-    optional double ask_size = 5;
-    optional double last_sale = 6;
-    optional double last_size	= 7;
-    optional double quote_time	= 8;
-    optional double trade_time	= 9;
-    optional string exchange	= 10;
-    optional double volume = 11;
+    string id = 1;
+    double ask = 2;
+    double bid = 3;
+    int64 timestamp = 4;
+    string instrument = 5;
+    AssetClass asset_class = 6;
+    Side side = 7;
+    int64 volume = 8;
+}
+
+enum AssetClass {
+    FX = 0;
+    FI = 1;
+    COMMODITY = 2;
+    EQUITY = 3;
+}
+
+enum Side {
+    B = 0;
+    S = 1;
 }
